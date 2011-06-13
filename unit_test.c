@@ -18,17 +18,13 @@
 #define IN 0
 #define OUT 1
 
+/* start_prototype */
 void remove_char(char c, char *str){
-  char curr;
-  int read, write;
 
-  read = write = 0;
-  do{
-    curr = str[read++];
-    if (curr != c)
-      str[write++] = curr;
-  } while (curr);
+  /* Your C program goes here */
+
 }
+/* end_prototype */
 
 /* Pipe used to communicate with each forked process */
 int pipe_des[2];
