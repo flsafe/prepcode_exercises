@@ -5,9 +5,16 @@
 #include <sys/wait.h>
 #include <sys/types.h>
 
+/* Specifies the number of unit tests */
 #define N_UNIT_TESTS 2
+
+/* The maxium length of the YAML output string */
 #define MAX_YAML_LEN 1024
+
+/* The indentation in spaces in the yaml string */
 #define INDENT 4
+
+/* File descriptors for stdin and stdout */
 #define IN 0
 #define OUT 1
 
@@ -87,7 +94,7 @@ void print_test_info(struct yaml_string * ys,
   flush_yaml(ys);
 }
 
-void print_test_output(struct yaml_string * ys, char *str){
+void print_test_output(struct yaml_string * ys, char * str){
   append_line(ys, "output: |", INDENT);
     append_line(ys, str, INDENT * 2);
   flush_yaml(ys);
@@ -99,6 +106,7 @@ void test_first_char(){
   struct yaml_string * ys = create_yaml();
 
   print_test_info(ys, "test_first_char", "a abcd", "bcd", "10");
+  print_test_output(ys, "bcd");
 }
 
 void test_last_char(){
@@ -107,11 +115,10 @@ void test_last_char(){
   struct yaml_string * ys = create_yaml();
 
   print_test_info(ys, "test_last_char", "a abcd", "bcd", "10");
+  print_test_output(ys, "bcd");
 }
 
-void collect_results(){
-
-  /* TODO: Collect the yaml strings from each unit test */
+void print_results(){
   int bytes_read, err;
   char buff[MAX_YAML_LEN] = "";
 
@@ -163,7 +170,7 @@ void run_tests(){
         err = wait(&stat);
         quitif(err);
 
-        collect_results();
+        print_results();
         break;
     }
   }
