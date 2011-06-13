@@ -18,7 +18,17 @@
 #define IN 0
 #define OUT 1
 
-void remove_char(char c, char *str){}
+void remove_char(char c, char *str){
+  char curr;
+  int read, write;
+
+  read = write = 0;
+  do{
+    curr = str[read++];
+    if (curr != c)
+      str[write++] = curr;
+  } while (curr);
+}
 
 /* Pipe used to communicate with each forked process */
 int pipe_des[2];
@@ -101,21 +111,27 @@ void print_test_output(struct yaml_string * ys, char * str){
 }
 
 void test_first_char(){
-
-  /* TODO: Write the test case */
+  char str[128] = "abcd";
   struct yaml_string * ys = create_yaml();
 
   print_test_info(ys, "test_first_char", "a abcd", "bcd", "10");
-  print_test_output(ys, "bcd");
+
+  remove_char('a', str);
+  str[sizeof(str) - 1] = '\0'; 
+
+  print_test_output(ys, str); 
 }
 
 void test_last_char(){
-
-  /* TODO: Write the test case */
+  char str[128] = "abcde";
   struct yaml_string * ys = create_yaml();
 
-  print_test_info(ys, "test_last_char", "a abcd", "bcd", "10");
-  print_test_output(ys, "bcd");
+  print_test_info(ys, "test_last_char", "e abcde", "abcd", "10");
+  
+  remove_char('e', str);
+  str[ sizeof(str) - 1] = '\0';
+  
+  print_test_output(ys, str);
 }
 
 void print_results(){
