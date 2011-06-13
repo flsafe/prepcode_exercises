@@ -45,13 +45,13 @@ struct yaml_string * create_yaml(){
 }
 
 void append_line(struct yaml_string * s, char * str, int indent){
-
-  /* TODO: Add error checking. Make sure we don't write past 
-   * the yaml buffer */
-
-  int len = strlen(str);
   int i;
+  int len = strlen(str);
 
+  if (s->write + len > MAX_YAML_LEN)
+    return;
+
+  indent = indent < 0 ? 0 : indent;
   for (i = 0 ; i < indent ; i++)
     s->yaml[s->write++] = ' ';
 
