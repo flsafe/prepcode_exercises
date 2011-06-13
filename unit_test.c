@@ -20,6 +20,9 @@
 
 void remove_char(char c, char *str){}
 
+/* Pipe used to communicate with each forked process */
+int pipe_des[2];
+
 /* Used to ditch when something goes wrong */
 void quitif(int err){
   if (-1 == err){
@@ -27,9 +30,6 @@ void quitif(int err){
     exit(1);
   }
 }
-
-/* Pipe used to communicate with each forked process */
-int pipe_des[2];
 
 /* Used to build a yaml string */
 struct yaml_string{
