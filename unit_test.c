@@ -6,7 +6,7 @@
 #include <sys/types.h>
 
 /* Specifies the number of unit tests */
-#define N_UNIT_TESTS 2
+#define N_UNIT_TESTS 5
 
 /* The maxium length of the YAML output string */
 #define MAX_YAML_LEN 1024
@@ -18,13 +18,13 @@
 #define IN 0
 #define OUT 1
 
-/* start_prototype */
+/*start_prototype*/
 void remove_char(char c, char *str){
 
   /* Your C program goes here */
 
 }
-/* end_prototype */
+/*end_prototype*/
 
 /* Pipe used to communicate with each forked process */
 int pipe_des[2];
@@ -110,7 +110,7 @@ void test_first_char(){
   char str[128] = "abcd";
   struct yaml_string * ys = create_yaml();
 
-  print_test_info(ys, "test_first_char", "a abcd", "bcd", "10");
+  print_test_info(ys, "test_first_char", "a abcd", "bcd", "20");
 
   remove_char('a', str);
   str[sizeof(str) - 1] = '\0'; 
@@ -122,7 +122,43 @@ void test_last_char(){
   char str[128] = "abcde";
   struct yaml_string * ys = create_yaml();
 
-  print_test_info(ys, "test_last_char", "e abcde", "abcd", "10");
+  print_test_info(ys, "test_last_char", "e abcde", "abcd", "20");
+  
+  remove_char('e', str);
+  str[ sizeof(str) - 1] = '\0';
+  
+  print_test_output(ys, str);
+}
+
+void test_3(){
+  char str[128] = "abcde";
+  struct yaml_string * ys = create_yaml();
+
+  print_test_info(ys, "test_3", "e abcde", "abcd", "20");
+  
+  remove_char('e', str);
+  str[ sizeof(str) - 1] = '\0';
+  
+  print_test_output(ys, str);
+}
+
+void test_4(){
+  char str[128] = "abcde";
+  struct yaml_string * ys = create_yaml();
+
+  print_test_info(ys, "test_4", "e abcde", "abcd", "20");
+  
+  remove_char('e', str);
+  str[ sizeof(str) - 1] = '\0';
+  
+  print_test_output(ys, str);
+}
+
+void test_5(){
+  char str[128] = "abcde";
+  struct yaml_string * ys = create_yaml();
+
+  print_test_info(ys, "test_5", "e abcde", "abcd", "20");
   
   remove_char('e', str);
   str[ sizeof(str) - 1] = '\0';
@@ -151,7 +187,10 @@ void run_tests(){
   void (** unit_test) (void);
   void (* test_fns[N_UNIT_TESTS + 1]) (void) = 
     {test_first_char,
-     test_last_char, NULL};
+     test_last_char,
+     test_3,
+     test_4,
+     test_5, NULL};
 
   for (unit_test = test_fns ; *unit_test ; unit_test++){
 
