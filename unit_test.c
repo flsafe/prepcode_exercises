@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <signal.h>
 #include <sys/wait.h>
 #include <sys/types.h>
 
@@ -147,7 +148,7 @@ void test_4(){
   struct yaml_string * ys = create_yaml();
 
   print_test_info(ys, "test_4", "e abcde", "abcd", "20");
-  
+
   remove_char('e', str);
   str[ sizeof(str) - 1] = '\0';
   
@@ -179,6 +180,60 @@ void print_results(){
   quitif(err);
 }
 
+void err_handler(int sig){
+
+  int i;
+  char arith_err[128] = "";
+  char mem_err[128] = "";
+  char sys_err[128] = "";
+  char indent[128] = "";
+
+  for (i = 0 ; i < INDENT ; i++)
+    indent[i] = ' ';  
+  sprintf(arith_err, "%s%s", indent, "error: arithmetic\n");
+  sprintf(mem_err, "%s%s", indent, "error: memory\n");
+  sprintf(sys_err, "%s%s", indent, "error: memory\n");
+
+  switch (sig){
+    case SIGFPE:
+      write(pipe_des[OUT], arith_err, strlen(arith_err));
+    break;
+
+    case SIGBUS:
+      write(pipe_des[OUT], mem_err, strlen(mem_err));
+    break;
+
+    case SIGSEGV:
+      write(pipe_des[OUT], mem_err, strlen(mem_err));
+    break;
+
+    case SIGSYS:
+      write(pipe_des[OUT], sys_err, strlen(sys_err));
+    break;
+
+    case SIGILL:
+      write(pipe_des[OUT], mem_err, strlen(mem_err));
+    break;
+  }
+  raise(sig);
+}
+
+void handle_signals(){
+  struct sigaction act;
+
+  sigemptyset(&act.sa_mask);
+  sigemptyset(&act.sa_mask);
+  act.sa_flags = SA_RESETHAND;
+  act.sa_handler = err_handler;
+
+  sigaction(SIGFPE, &act, NULL);
+  sigaction(SIGBUS, &act, NULL);
+  sigaction(SIGSEGV, &act, NULL);
+  sigaction(SIGSYS, &act, NULL);
+  sigaction(SIGILL, &act, NULL);
+  sigaction(SIGSYS, &act, NULL);
+}
+
 void run_tests(){
   int err;
   pid_t stat;
@@ -206,6 +261,8 @@ void run_tests(){
       /* Execute the unit test in the child */
       case 0:
         close(pipe_des[IN]);
+
+        handle_signals();
         
         (*unit_test)();
         err = close(pipe_des[OUT]);
