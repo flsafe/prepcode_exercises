@@ -94,6 +94,17 @@ int insert_word(char *word){
   return 0;
 }
 
+int is_word(char *word){
+  int i, h;
+
+  for (i = 0 ; i < HASH_TAB ; i++){
+    h = hash(word, i);
+    if (strcmp(word, wordtab[h].word) == 0)
+      return 1;
+  }
+  return 0;
+}
+
 void count_word_freqs(void){
   int i;
   char word[MAX_WORD];
@@ -103,8 +114,10 @@ void count_word_freqs(void){
   }
 
   for (i = 0 ; i < HASH_TAB ; i++)
-    if (NULL != wordtab[i].word)
+    if (NULL != wordtab[i].word){
       printf("%s %d\n", wordtab[i].word, wordtab[i].count);
+      printf("is word? %d\n", is_word(wordtab[i].word));
+    }
 }
 
 int main(){
