@@ -257,7 +257,7 @@ bucket in the hash table.
 If the bucket is empty or we have found the key we are looking for then
 we break out of the loop early and return the index of the bucket.
 
-While scaning the hash table if i == HASH_TAB then we've tried every bucket 
+While scaning the hash table if b == HASH_TAB then we've tried every bucket 
 in the hash table without finding the key and we return the index of the 
 last bucket we tested.
 
