@@ -5,19 +5,20 @@ A hash table is an efficient way to map an identifying value with
 some associated data. We'll call the identifying value a 'key' and the
 associated data a 'record'.
 
-For example we could map a name to an address. 
+For example we could map names to addresses. 
 
 The key would be the name and the record would be the address. 
 
-The advantage of the hash table is that it allows us to quickly look 
-up a record based on a key.
-
-There is no need to search through the records in the hash table.
-
-We could also map words to a count of how many times that word appears
+Or we could map words to a counter of how many times that word appears
 in a text.
 
 The key would be the word and the record would be the counter for that word.
+
+The advantage of the hash table is that it allows us to quickly look 
+up a record based on a key without having to search through the entire
+datastructure.
+
+This is true no matter how many records there are in the data structure.
 
 In this part of the lecture we'll be discussing an implementation
 of a hash tabled called an open addressing hash table.
@@ -72,8 +73,8 @@ Ooops! Of course that bucket is already taken.
 
 But bucket 4 isn't taken, let's just use that one. 
 
-Thus our strategy is: If a bucket is taken then try to insert into the
-bucket: bucket +1.
+Thus our strategy is: If, during insertion, the target bucket 
+is taken then try to insert into the bucket: bucket +1.
 
 This is where the name "open addressing" comes from. 
 
@@ -89,7 +90,8 @@ bucket five.
 
 Since bucket 5 is empty we'll insert 'kiki' there.
 
-It's possible that there isn't a free bucket to insert a new record into.
+Keep in mind that it's possible that there isn't a free bucket to 
+insert a new record into.
 
 A closed addressing hash table of size 'm' will only hold 'm' records.
 
@@ -153,9 +155,11 @@ the key 'apple' has been inserted.
 First we'll test if the key is found at h(s,0). 
 
 If we find "apple" then we finished and the member operator returns true.
+
 If we don't find "apple" at h(s, 0) then we test h(s, 1), h(s, 2) and so on
-until we either find an empty bucket or we've tried all the buckets. In either case
-the key is not in the hash table and we return false.
+until we either find an empty bucket or we've tried all the buckets. 
+
+In either case the key is not in the hash table and we return false.
 
 In the next part of the lesson we'll go over a sample implementation of the
 hash table data structure in the C programming language. See you next time!
@@ -163,15 +167,17 @@ hash table data structure in the C programming language. See you next time!
 == Part 2 ==
 
 In this part of the lecture we'll fire up the text editor and rack up
-some keyboard time. We'll be implementing a simple open addressing
+some keyboard time. 
+
+We'll be implementing a simple open addressing
 hash table.
 
 [Action: Implementing a hash table record]
 
 We'll start by defining how big the array for our hash table is going to be.
 
-This really depends on your input keys but in general one bucket per possible key
-is a good idea.
+This really depends on your input keys and your desired performance but
+one bucket per key might be a good starting place.
 
 [Action: define HASH_TAB]
 
@@ -185,7 +191,7 @@ However it might be useful to associate additional data
 with the key depending on your application.
 
 The data associated with the key could be as simple as a boolean value,
-a counter, or as complex as another data structure altogether.
+a counter, or as complex sperate data structure altogether.
 
 We'll try and keep it simple for now.
 
@@ -211,8 +217,8 @@ of our array so the operation is done modulo HASH_TAB.
 The h1 hash function takes a character string and returns a hash value for
 that character string. 
 
-One simple and effective string hash function 
-add each character adds it to some multiple of the hash value computed so far. 
+One simple and effective string hash function is to
+add each character to some multiple of the hash value computed so far. 
 
 The value 37 is a prime number that works well for hasing strings.
 
@@ -230,6 +236,9 @@ and h2 is always returns an odd value.
 
 To make the implmentation of both the insertion and member functions easier, 
 we're going to implement a helper function named locate.
+
+the locate function will help us by returning the index of the bucket associated
+with the given key.
 
 This helper function takes two arguments.
 
@@ -249,6 +258,7 @@ If the bucket is empty or we have found the key we are looking for then
 we break out of the loop early and return the index of the bucket.
 
 While scaning the hash table if i == HASH_TAB then we've tried every bucket 
-in the hash table and we return the index of the last bucket we tested.
+in the hash table without finding the key and we return the index of the 
+last bucket we tested.
 
     [Action: implement member]
