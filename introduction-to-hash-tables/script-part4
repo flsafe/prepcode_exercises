@@ -1,0 +1,33 @@
+
+
+
+== Part 4 ===
+
+
+Open addressing hash tables have the potential to perform faster
+key look ups than a pointer based hash table because there is no
+overhead related to storing and following pointers, such as 
+in a chaining based implementation where keys that share buckets are
+stored together in a linked list.
+
+This open addressing implementation could be preferable to a chaining
+implementation if the hash records take up less space than the pointers
+in a chaining implementation. 
+
+However open addressing hash tables aren't well suited to deletion
+operations.
+
+If you need to support the ability to remove a key and its record then
+a chaining solution is preferred.
+
+We describe how full a hash table by calculating its load factor.
+
+    [Action: draw load factor equation]
+
+The load factor is defined as
+
+    alpha = n/m
+
+where n is the number filled buckets and m is the total number of buckets.
+
+In an open addressing hash table n<=m and apha is <= 1.
