@@ -1,0 +1,163 @@
+
+
+== PART 2 ==
+
+
+In this part of the lecture we'll fire up the text editor and rack up
+some keyboard time. 
+
+We'll be implementing a simple open addressing
+hash table.
+
+[Action: Implementing a hash table record]
+
+We'll start by defining how big the array for our hash table is going to be.
+
+This really depends on your input keys and your desired performance but
+one bucket per key might be a good starting place.
+
+[Action: define HASH_TAB]
+
+Next we'll declare the structure that will represent each
+record in our hash table. 
+
+The structure, named hashrec which is short for 'hash record', is composed of
+a character string, which we'll use as the key. 
+
+However it might be useful to associate additional data 
+with the key depending on your application.
+
+The data associated with the key could be as simple as a boolean value,
+a counter, or as complex sperate data structure altogether.
+
+We'll try and keep it simple for now.
+
+    [Action: Implementing the hash(), h1(), h2()]
+
+Next we'll implment our hash functions. 
+
+Recall that our hashing strategy is going to be double hashing. 
+
+Our hash function will take the form hash(s, i) where s is the character
+string we'll be using as the key and i is the current hash attempt starting
+at i == 0.
+
+The implementation is simple.
+
+We'll take the value of h1(s) and add it to some multiple of h2(s).
+
+We want to make sure that the resulting hash value doesn't go past the end
+of our array so the operation is done modulo HASH_TAB.
+
+    [Action: Implmenent h1]
+
+The h1 hash function takes a character string and returns a hash value for
+that character string. 
+
+One simple and effective string hash function is to
+add each character to some multiple of the hash value computed so far. 
+
+The value 37 is a prime number that works well for hasing strings.
+
+    [Action: Implement h2]
+
+h2 is a different hash function and it is based on h1 so we can avoid
+some code duplication.
+
+Remember that the size of the hash table and h2 must be co-prime. 
+
+Here we've made sure that the hash table size is a power of 2
+and h2 is always returns an odd value.
+
+    [Action: Implement locate]
+
+To make the implmentation of both the insertion and member functions easier, 
+we're going to implement a helper function named locate.
+
+the locate function will help us by returning the index of the bucket associated
+with the given key.
+
+This helper function takes two arguments.
+
+The first is a hash table and the second is a character string key. 
+
+The function scans the hash table until either an empty bucket is found, 
+the key is found, or the entire hash table is scanned without finding the key.
+
+The first index of the bucket where any these conditions occurs is returned. 
+
+    [Action: implement the for loop of locate]
+
+We'll start with a for loop that will allows us to scan every
+bucket in the hash table.
+
+If the bucket is empty or we have found the key we are looking for then
+we break out of the loop early and return the index of the bucket.
+
+While scanning the hash table if b == HASH_TAB then we've tried every bucket 
+in the hash table without finding the key and we return the index of the 
+last bucket we tested.
+
+    [Action: implement member]
+
+Now we're ready to implement the member function.
+
+We'll use the locate function to find the key we're looking for.
+
+Remember that locate will return either the bucket index of the empty bucket 
+that the key would be in had it been inserted, thereby determining that the
+key isn't in the hash table, or the bucket index of the key we 
+are searching for, or the bucket index of the last bucket checked, thereby
+determining that all buckets have been checked without finding the key.
+
+In the member function we test if the bucket index is empty, if it is
+then we return 0.
+
+If the bucket index is not empty, then we return 1 if the bucket's key
+matches our search key and 0 otherwise.
+
+    [Action: implement insert]
+
+Equipped with our new member function we can write a easily write an insertion
+function.
+
+If the key is already in the hash table the function simply returns true
+as if it had been inserted.
+
+Otherwise we know that the key isn't in the hash table.
+
+We'll need to insert the key at the first empty bucket we find. 
+
+Luckily our locate function does exactly that. 
+
+If the bucket isn't empty then then the hash table is full and we'll return
+0 to signify the insertion operation failed.
+
+To insert the key we simply make a copy of the key and store the pointer
+to the copy in our bucket.
+
+Remember that the memory allocated for this key should be deallocated with
+the 'free' function but for now I've left his part out. 
+
+    [Action: Implement init_hash_table]
+
+Our final function is the init_hash_table function.
+
+This function takes a hash table as input and sets all the keys in
+the hash table to NULL.
+
+This way we can identify empty slots with keys that have been set to NULL.
+
+We've gone over implementations for the insert and member operations but what
+about a delete operation? 
+
+How do we remove a key and its associated record?
+
+Open addressing hash tables are not well suited for the deletion operation so
+if you need to support that operation you should choose a different hash
+table implementation, particularly a chaining hash table.
+
+Be sure to checkout that lesson! 
+
+In the next lecture we'll be going over a simple algorithm to detect
+duplicate strings in an array. See you net time.

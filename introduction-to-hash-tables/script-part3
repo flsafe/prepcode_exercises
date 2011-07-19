@@ -1,0 +1,34 @@
+
+
+== PART 3 ==
+
+
+In this part of the lecture we'll be going over a simple example of
+how to use a hash table in a program.
+
+Given an array of strings we'll use a hash table to detect the first
+duplicate string going from left to right.
+
+    [Action: Implement a sample program]
+
+We'll declare an array of hashrec of size HASH_TAB and an array of
+character strings.
+
+We'll use init_hash_table to make sure our initial buckets are empty.
+
+To detect a duplicate we'll iterate through each string and if the string
+isn't in our hash table we'll simply insert it. 
+
+If a string is already in our hash table then that string is a duplicate and
+we print the duplicate string.
+
+    [Action: Change the string array and run the program again]
+
+Let's try out our algorithm by changing the array of string a bit.
+
+Don't let this example limit your imagination on how hash tables can be used.
+
+We could implement hash tables that map integers, strings, points or any
+other convenient thing to strings, integers other data structures and so on.
+
+In the next lecture we'll be going over a bit of theory on hash tables.
