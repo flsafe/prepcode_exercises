@@ -28,8 +28,7 @@ Lets take a look at how an open addressing hash table works.
 
 At the heart of a hash table is an array. 
 
-Let's say our keys a word made of characters,
-specifically a C character string. 
+Let's say our keys are words the we represent using C character strings.
 
 We want to map a word to a location in our hash table.
 
@@ -73,7 +72,7 @@ Ooops! Of course that bucket is already taken.
 
 But bucket 4 isn't taken, let's just use that one. 
 
-Thus our strategy is: If a bucket is taken try to insert into the
+Thus our strategy is: If a bucket is taken then try to insert into the
 bucket: bucket +1.
 
 This is where the name "open addressing" comes from. 
@@ -85,13 +84,14 @@ Let's do an example.
 
     [Action: Show insertion of 'kiwi' into bucket 3]
 
-If 'kiwi' where to evaluate into bucket 3 then, we'll try bucket 3
-then bucket 4 then 5.
+If 'kiwi' were to evaluate into bucket 3, then we'll try bucket 4, then
+bucket five.
 
 Since bucket 5 is empty we'll insert 'kiki' there.
 
-If we were to have run out of buckets to try then our hash table is full
-and we'll signal some kind of error.
+It's possible that there isn't a free bucket to insert a new record into.
+
+A closed addressing hash table of size 'm' will only hold 'm' records.
 
 This technique of trying buckets next to each other is called linear probing 
 and although it is simple it suffers from a problem called 
@@ -101,12 +101,14 @@ and although it is simple it suffers from a problem called
 
 Notice how long runs of records build up. 
 
-When searching for an item in the hash table it is no longer sufficient to
-check only the bucket at h(s) where 's' is some string.
+In this case when searching for an item in the hash table it is no longer sufficient 
+to check only the bucket at h(s).
+
+This might be okay.
 
 Having to check one or two buckets on average is okay, but as the hash
 table fills up, or we are unlucky and get lots of collisions from our
-input strings, the advantage of our hash table is lost and we might as
+input strings, then the advantage of our hash table is lost and we might as
 well be using a regular array.
 
 We can avoid these long runs of records with a different hashing strategy
@@ -118,21 +120,22 @@ The hash function for the double hashing strategy takes the form:
 
     h(s,i) = (h1(s) + i * h2(s)) mod m
 
-Where m is the size of the array we are using for the hash table and
-i is the is the current probe attempt starting at i = 0;
+Where m is the size of the array and i is the is the hash attempt 
+starting at i = 0.
 
     [Action: Draw out example h(s,0), h(s, 1) ]
 
-Now when we insert into our hash table we'll first check the bucket at h(s,0)
-then bucket at h(s,1) until we find an empty bucket or we've tried 
+To insert into our hash table we'll check the bucket at h(s,0)
+then bucket at h(s,1) and so on until we find an empty bucket or we've tried 
 all the buckets. 
 
 The double hashing strategy works much better than the linear probing
 strategy but we have to make sure that m, the size of the array, and
 the value of h2(s,i) meet certain constraints.
 
-m and h2(s,i) must be co-prime. In other words the greatest common factor
-of m and h2(s, i) must be 1.
+m, the size of the array, and h2(s,i) must be co-prime. 
+
+In other words the greatest common factor of m and h2(s, i) must be 1.
 
 One way to do this is to make sure that m is a power of two and that h2(s,i)
 is always odd.
@@ -145,12 +148,14 @@ been inserted into our hash table.
     [Action: Testing membership of "apple"]
 
 The concept is similar to insertion. Let's say we want to determine if 
-there is a record for the key "apple". Then we'll test the record at h(s,0). 
+the key 'apple' has been inserted. 
 
-If we find "apple" then we finished, and the member operator returns true.
-If we don't find apple at h(s, 0) then we test h(s, 1), h(s, 2) and so on
-until we find an empty bucket or we've tried all the buckets then the
-member operator returns false.
+First we'll test if the key is found at h(s,0). 
+
+If we find "apple" then we finished and the member operator returns true.
+If we don't find "apple" at h(s, 0) then we test h(s, 1), h(s, 2) and so on
+until we either find an empty bucket or we've tried all the buckets. In either case
+the key is not in the hash table and we return false.
 
 In the next part of the lesson we'll go over a sample implementation of the
 hash table data structure in the C programming language. See you next time!
@@ -163,50 +168,53 @@ hash table.
 
 [Action: Implementing a hash table record]
 
-We'll start by defining how big our hash table is going to be.
+We'll start by defining how big the array for our hash table is going to be.
+
+This really depends on your input keys but in general one bucket per possible key
+is a good idea.
 
 [Action: define HASH_TAB]
 
 Next we'll declare the structure that will represent each
 record in our hash table. 
 
-The structure, named hashrec which is short for hash record, is composed of
-only a character string which we'll use the key. 
+The structure, named hashrec which is short for 'hash record', is composed of
+a character string, which we'll use as the key. 
 
-However it might be useful to store other data depending on your application.
+However it might be useful to associate additional data 
+with the key depending on your application.
 
-The record associated with the key could be as simple as a boolean value,
-a counter, or another data structure.
+The data associated with the key could be as simple as a boolean value,
+a counter, or as complex as another data structure altogether.
 
 We'll try and keep it simple for now.
 
     [Action: Implementing the hash(), h1(), h2()]
 
-Next we'll define our hash functions. 
+Next we'll implment our hash functions. 
 
 Recall that our hashing strategy is going to be double hashing. 
 
 Our hash function will take the form hash(s, i) where s is the character
-string we'll be using as the key and i is the current probe attempt starting
+string we'll be using as the key and i is the current hash attempt starting
 at i == 0.
 
 The implementation is simple.
 
-We'll take the value of h1(word) and add it to some multiple of h2(word).
+We'll take the value of h1(s) and add it to some multiple of h2(s).
 
 We want to make sure that the resulting hash value doesn't go past the end
 of our array so the operation is done modulo HASH_TAB.
 
     [Action: Implmenent h1]
 
-The h1 hash function take a character string and returns a hash value for
+The h1 hash function takes a character string and returns a hash value for
 that character string. 
 
-A simple and effective string hash function takes the integer value for
-every character of the string and adds it to some multiple of the hash value
-so far. 
+One simple and effective string hash function 
+add each character adds it to some multiple of the hash value computed so far. 
 
-The value 37 is a prime number that works well.
+The value 37 is a prime number that works well for hasing strings.
 
     [Action: Implement h2]
 
@@ -215,41 +223,32 @@ some code duplication.
 
 Remember that the size of the hash table and h2 must be co-prime. 
 
-Here we've made sure that h2 is always odd and the hash table size is
-a power of two.
+Here we've made sure that the hash table size is a power of 2
+and h2 is always returns an odd value.
 
     [Action: Implement locate]
 
-To help us with both the insertion and member operation we're going to
-first implement a helper function named locate.
+To make the implmentation of both the insertion and member functions easier, 
+we're going to implement a helper function named locate.
 
-This helper function takes two arguments a hash table and a character
-string key.
+This helper function takes two arguments.
+
+The first is a hash table and the second is a character string key. 
 
 The function scans the hash table until either an empty bucket is found, 
-the key's record is found, or the entire hash table is scanned without finding
-the key's record.
+the key is found, or the entire hash table is scanned without finding the key.
 
-The index of the bucket where any these conditions first 
-occurs is returned. 
+The first index of the bucket where any these conditions occurs is returned. 
 
-It will be clear why this is useful when we implement the insertion and
-member functions.
+    [Action: implement the for loop of locate]
 
-    [Action: implement the for loop]
-
-We'll start with a for loops that will allows us to scan every
+We'll start with a for loop that will allows us to scan every
 bucket in the hash table.
 
-We use the hash function to determine the first bucket we'll test.
-
-If the bucket is empty or we have found the key we are looking for
+If the bucket is empty or we have found the key we are looking for then
 we break out of the loop early and return the index of the bucket.
 
-However if the condition i < HASH_TAB becomes false then we know
-we've tried every bucket in that hash table and we return the index
-of the last bucket we tested.
+While scaning the hash table if i == HASH_TAB then we've tried every bucket 
+in the hash table and we return the index of the last bucket we tested.
 
     [Action: implement member]
-
-
