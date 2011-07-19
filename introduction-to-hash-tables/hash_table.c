@@ -53,22 +53,22 @@ int locate(struct hashrec hashtab[], char *key){
 }
 
 int member(struct hashrec hashtab[], char *key){
-  int i = locate(hashtab, key);
-  if (NULL == hashtab[i].key) 
+  int b = locate(hashtab, key);
+  if (NULL == hashtab[b].key) 
     return 0;
   else
-    return strcmp(hashtab[i].key, key) == 0;
+    return strcmp(hashtab[b].key, key) == 0;
 }
 
 int insert(struct hashrec hashtab[], char *key){
-  int i;
+  int b;
 
   if (member(hashtab, key))
     return 1;
 
-  i = locate(hashtab, key);
-  if (NULL == hashtab[i].key){
-    hashtab[i].key = strdup(key);
+  b = locate(hashtab, key);
+  if (NULL == hashtab[b].key){
+    hashtab[b].key = strdup(key);
     return 1;
   } 
   else
@@ -76,23 +76,23 @@ int insert(struct hashrec hashtab[], char *key){
 }
 
 void init_hash_table(struct hashrec hashtab[]){
-  int i;
+  int b;
 
-  for (i = 0 ; i < HASH_TAB ; i++)
-    hashtab[i].key = NULL;
+  for (b = 0 ; b < HASH_TAB ; b++)
+    hashtab[b].key = NULL;
 }
 
 int main(){
   struct hashrec hashtab[HASH_TAB];
-  char *set1[] = {"apple", "grape", "cherry", "orange", "apple"}; 
+  char *set[] = {"apple", "grape", "cherry", "orange", "apple"}; 
   size_t i;
 
   init_hash_table(hashtab); 
-  for (i = 0 ; i < sizeof(set1)/sizeof(char*) ; i++){
-    if (!member(hashtab, set1[i]))
-      insert(hashtab, set1[i]);
+  for (i = 0 ; i < sizeof(set)/sizeof(char*) ; i++){
+    if (!member(hashtab, set[i]))
+      insert(hashtab, set[i]);
     else{
-      printf("Duplicate: %s\n", set1[i]);
+      printf("Duplicate: %s\n", set[i]);
       break;
     }
   }
