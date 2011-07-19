@@ -30,4 +30,38 @@ The load factor is defined as
 
 where n is the number filled buckets and m is the total number of buckets.
 
-In an open addressing hash table n<=m and apha is <= 1.
+In an open addressing hash table n<=m and alpha is <= 1.
+
+We can use alpha to describe how buckets, on average, will be searched
+when looking for a key with the member operation.
+
+In an unsuccessful member operation,  that is to say the 
+key isn't found in the hash table, we can expect the average 
+number of buckets searched to be no more than 
+
+  1 / (1 - theta)
+
+Suppose that the hash table is half-full, then theta == .50.
+
+We can expect to search no more than 
+
+  1 / (1 - 0.5) == 2
+
+buckets.
+
+An unsuccessful member or insertion operation go through the same
+probing sequence except that the insertion operation inserts a new record
+at the end of its sequence.
+
+Thus the both the insertion and member operations search through no more than
+
+  1 / (1 - theta) 
+
+buckets.
+
+A successful member operation goes through at most
+
+  (1 / theta) * ln(1 / 1 - theta)
+
+For example if the hash table is half full then a successful member
+operation looks through at most 1.387 buckets.
