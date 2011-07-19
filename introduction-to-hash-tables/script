@@ -127,7 +127,7 @@ starting at i = 0.
 
     [Action: Draw out example h(s,0), h(s, 1) ]
 
-To insert into our hash table we'll check the bucket at h(s,0)
+To insert into our hash table we'll check the bucket at h(s,0),
 then bucket at h(s,1) and so on until we find an empty bucket or we've tried 
 all the buckets. 
 
@@ -154,12 +154,14 @@ the key 'apple' has been inserted.
 
 First we'll test if the key is found at h(s,0). 
 
-If we find "apple" then we finished and the member operator returns true.
+The member operation will return true if the bucket contains the key
+"apple".
 
 If we don't find "apple" at h(s, 0) then we test h(s, 1), h(s, 2) and so on
-until we either find an empty bucket or we've tried all the buckets. 
+until we either we find our key, or we find an empty bucket, 
+or we've tried all the buckets. 
 
-In either case the key is not in the hash table and we return false.
+In the later two cases the key is not in the hash table and we return false.
 
 In the next part of the lesson we'll go over a sample implementation of the
 hash table data structure in the C programming language. See you next time!
@@ -257,8 +259,24 @@ bucket in the hash table.
 If the bucket is empty or we have found the key we are looking for then
 we break out of the loop early and return the index of the bucket.
 
-While scaning the hash table if b == HASH_TAB then we've tried every bucket 
+While scanning the hash table if b == HASH_TAB then we've tried every bucket 
 in the hash table without finding the key and we return the index of the 
 last bucket we tested.
 
     [Action: implement member]
+
+Now we're ready to implement the member function.
+
+We'll use the locate function to find the key we're looking for.
+
+Remember that locate will return either the bucket index of the empty bucket 
+that the key would be in had it been inserted, thereby determining that the
+key isn't in the hash table, or the bucket index of the key we 
+are searching for, or the bucket index of the last bucket checked, thereby
+determining that all buckets have been checked without finding the key.
+
+In the member function we test if the bucket index is empty, if it is
+then we return 0.
+
+If the bucket index is empty, then we return 1 if the bucket's key
+matches our search key and 0 otherwise.
