@@ -10,17 +10,18 @@ overhead related to storing and following pointers, such as
 in a chaining based implementation where keys that share buckets are
 stored together in a linked list.
 
-This open addressing implementation could be preferable to a chaining
-implementation if the hash records take up less space than the pointers
-in a chaining implementation. 
+This open addressing implementation could be more memory efficent 
+compared to a chaining implementation if the hash records take up 
+much less space than the pointers in a chaining implementation 
+and the percentage of full buckets isn't too sparse. 
 
-However open addressing hash tables aren't well suited to deletion
+Open addressing hash tables aren't well suited to deletion
 operations.
 
 If you need to support the ability to remove a key and its record then
 a chaining solution is preferred.
 
-We describe how full a hash table by calculating its load factor.
+We can describe how full a hash table by calculating its load factor.
 
     [Action: draw load factor equation]
 
@@ -32,14 +33,15 @@ where n is the number filled buckets and m is the total number of buckets.
 
 In an open addressing hash table n<=m and alpha is <= 1.
 
-We can use alpha to describe how buckets, on average, will be searched
-when looking for a key with the member operation.
+We can use alpha to describe many buckets, on average, will be probed 
+when searching for a key assuming that our hash
+function does a good job of distributing keys uniformly in the hash table.
 
 In an unsuccessful member operation,  that is to say the 
 key isn't found in the hash table, we can expect the average 
 number of buckets searched to be no more than 
 
-  1 / (1 - theta)
+  1 / (1 - theta) assuming uniform hashing
 
 Suppose that the hash table is half-full, then theta == .50.
 
@@ -49,19 +51,43 @@ We can expect to search no more than
 
 buckets.
 
+    [Action: Show a probe sequence example]
+
 An unsuccessful member or insertion operation go through the same
 probing sequence except that the insertion operation inserts a new record
 at the end of its sequence.
 
-Thus the both the insertion and member operations search through no more than
+Thus the both the insertion and member operations probe through no more than
 
-  1 / (1 - theta) 
+  1 / (1 - theta) assuming uniform hashing
 
 buckets.
 
-A successful member operation goes through at most
+A successful member operation goes probes at most
 
-  (1 / theta) * ln(1 / 1 - theta)
+  (1 / theta) * ln(1 / 1 - theta) assuming uniform hashing 
+
 
 For example if the hash table is half full then a successful member
-operation looks through at most 1.387 buckets.
+operation probes at most 1.387 buckets.
+
+
+Another advantage that chaining hash tables have over open addressing hash
+tables is that they degrade linearly as the load factor approaches 1 or
+surpasses 1. 
+
+As the load factor approaches 1 the number of bucket probes
+increases dramatically.
+
+Depending on your performance needs,
+once a load factor gets too large it may be a good idea to
+add more buckets to the hash table.
+
+A simple way of doing this is to allocate a new array and reinsert the
+hash records into the new array.
+
+Although this may sound like an expensive operation, eventually it will 
+will be more efficient than continuing to use an overloaded hash table.
+
+That's it for this introduction to hash tables lesson, be sure to try and
+practice what you've learned by completing the practice exercises. Good luck!
