@@ -32,7 +32,7 @@ unsigned int hash(char *key, int i){
   return (h1(key) + i * h2(key)) % HASH_TAB;
 }
 
-char *strdup(char *w){
+char *cpy(char *w){
   char *d, *dest;
 
   d = dest = malloc(strlen(w)+1);
@@ -68,7 +68,7 @@ int insert(struct hashrec hashtab[], char *key){
 
   b = locate(hashtab, key);
   if (NULL == hashtab[b].key){
-    hashtab[b].key = strdup(key);
+    hashtab[b].key = cpy(key);
     return 1;
   } 
   else
