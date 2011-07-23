@@ -8,48 +8,49 @@ struct hashrec {
   char *key; 
 };
 
-unsigned int h1(char *key){
-  unsigned int hash;
-  char *c;
+unsigned int h1(char *k){
+  unsigned int h;
+  unsigned char *c;
   
-  c = key;
-  for(hash = 0 ; *c ; c++)
-    hash = hash * 37 + *c;
-  return hash;
+  h = 0;
+  for (c = (unsigned char*)k ; *c ; c++)
+    h = h * 37 + *c;
+  return h;
 }
 
-unsigned int h2(char *key){
-  unsigned int hash;
-  
-  hash = h1(key) + 1;
-  if (hash % 2 == 0)
-    return hash + 1;
-  else
-    return hash;
+unsigned int h2(char *k){
+  unsigned int h;
+  unsigned char *c;
+
+  for (c = (unsigned char*)k ; *c ; c++)
+    h = h * 31 + *c;
+  return h % 2 == 0 ? h+1 : h;
 }
 
-unsigned int hash(char *key, int i){
-  return (h1(key) + i * h2(key)) % HASH_TAB;
+unsigned int hash(char *k, int i){
+  return (h1(k) + i * h2(k)) % HASH_TAB;
 }
 
 char *cpy(char *w){
   char *d, *dest;
 
-  d = dest = malloc(strlen(w)+1);
-  while ((*d++ = *w++)) ;
+  d = dest = malloc(strlen(w) * sizeof(char) + 1);
+  if (d){
+    while ((*d++ = *w++)) ;
+  }
   return dest;
 }
 
-int locate(struct hashrec hashtab[], char *key){
-  int i, h;
+int locate(struct hashrec hashtab[], char *k){
+  int i, b;
 
   for (i = 0 ; i < HASH_TAB ; i++){
-    h = hash(key, i);
-    if (NULL == hashtab[h].key ||
-        strcmp(hashtab[h].key, key) == 0)
+    b = hash(k, i);
+    if (NULL == hashtab[b].key ||
+        strcmp(hashtab[b].key, k) == 0)
       break;
   }
-  return h;
+  return b;
 }
 
 int member(struct hashrec hashtab[], char *key){
@@ -63,15 +64,13 @@ int member(struct hashrec hashtab[], char *key){
 int insert(struct hashrec hashtab[], char *key){
   int b;
 
-  if (member(hashtab, key))
-    return 1;
-
   b = locate(hashtab, key);
   if (NULL == hashtab[b].key){
     hashtab[b].key = cpy(key);
     return 1;
-  } 
-  else
+  } else if (strcmp(hashtab[b].key, key) == 0){
+    return 1;
+  } else
     return 0;
 }
 
@@ -84,7 +83,7 @@ void init_hash_table(struct hashrec hashtab[]){
 
 int main(){
   struct hashrec hashtab[HASH_TAB];
-  char *set[] = {"apple", "grape", "cherry", "orange", "apple"}; 
+  char *set[] = {"grape", "cherry", "orange", "grape", "apple"}; 
   size_t i;
 
   init_hash_table(hashtab); 
