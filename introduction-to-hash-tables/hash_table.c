@@ -4,25 +4,26 @@
 
 #define HASH_TAB 512
 
-struct hashrec {
-  char *key; 
+struct hashrec{
+  char *key;
 };
 
 unsigned int h1(char *k){
   unsigned int h;
-  unsigned char *c;
-  
+  unsigned char *c; 
+
   h = 0;
-  for (c = (unsigned char*)k ; *c ; c++)
+  for (c = (unsigned char *) k ; *c ; c++)
     h = h * 37 + *c;
   return h;
 }
 
 unsigned int h2(char *k){
   unsigned int h;
-  unsigned char *c;
+  unsigned char *c; 
 
-  for (c = (unsigned char*)k ; *c ; c++)
+  h = 0;
+  for (c = (unsigned char *) k ; *c ; c++)
     h = h * 31 + *c;
   return h % 2 == 0 ? h + 1 : h;
 }
@@ -31,16 +32,7 @@ unsigned int hash(char *k, int i){
   return (h1(k) + i * h2(k)) % HASH_TAB;
 }
 
-char *cpy(char *s){
-  char *dest, *d;
-
-  d = dest = malloc(strlen(s) * sizeof(char) + 1);
-  if (d)
-    while ((*d++ = *s++)) ; /* Copy */
-  return dest;
-}
-
-int locate(struct hashrec hashtab[], char *k){
+unsigned int locate(struct hashrec hashtab[], char *k){
   unsigned int i, b;
 
   for (i = 0 ; i < HASH_TAB ; i++){
@@ -52,24 +44,33 @@ int locate(struct hashrec hashtab[], char *k){
   return b;
 }
 
-int member(struct hashrec hashtab[], char *key){
-  unsigned int b = locate(hashtab, key);
-  if (NULL == hashtab[b].key) 
+int member(struct hashrec hashtab[], char *k){
+  unsigned int b = locate(hashtab, k);
+  if (NULL == hashtab[b].key)
     return 0;
   else
-    return strcmp(hashtab[b].key, key) == 0;
+    return strcmp(hashtab[b].key, k) == 0;
 }
 
-int insert(struct hashrec hashtab[], char *key){
+char *cpy(char *s){
+  char *dest, *d;
+
+  d = dest = malloc(strlen(s) * sizeof(char) + 1);
+  if (d)
+    while ((*d++ = *s++)) ;
+  return dest;
+}
+
+int insert(struct hashrec hashtab[], char *k){
   unsigned int b;
 
-  b = locate(hashtab, key);
+  b = locate(hashtab, k);
   if (NULL == hashtab[b].key){
-    hashtab[b].key = cpy(key);
+    hashtab[b].key = cpy(k);
     return 1;
   }
   else
-    return strcmp(hashtab[b].key, key) == 0;
+    return strcmp(hashtab[b].key, k) == 0;
 }
 
 void init_hash_table(struct hashrec hashtab[]){
@@ -93,5 +94,6 @@ int main(){
       break;
     }
   }
+
   return 0;
 }
