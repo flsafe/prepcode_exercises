@@ -82,20 +82,23 @@ void init_hash_table(struct hashrec hashtab[]){
 
 int main(){
 
-  char *set[] = {"grape", "cherry", "orange", "grape", "apple"}; 
+  char *strings[] = {"grape", 
+                     "cherry", 
+                     "orange", 
+                     "apple"}; 
 
   struct hashrec hashtab[HASH_TAB];
   size_t i;
+  size_t n = sizeof(strings)/sizeof(char*);
 
-  init_hash_table(hashtab); 
-  for (i = 0 ; i < sizeof(set)/sizeof(char*) ; i++){
-    if (!member(hashtab, set[i]))
-      insert(hashtab, set[i]);
-    else{
-      printf("Duplicate: %s\n", set[i]);
+  init_hash_table(hashtab);
+  for (i = 0 ; i < n ; i++)
+    if (!member(hashtab, strings[i]))
+      insert(hashtab, strings[i]);
+    else {
+      printf("Duplicate: %s", strings[i]);
       break;
     }
-  }
 
   return 0;
 }
