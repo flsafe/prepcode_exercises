@@ -6,29 +6,52 @@
 In this part of the lecture we'll be going over a simple example of
 how to use a hash table in a program.
 
-Given an array of strings we'll use a hash table to detect the first
-duplicate string going from left to right.
+We'll implment a simple algorithm to efficiently detect dupicate strings
+in an array.
 
-    [Action: Implement a sample program]
+The problem is stated as:
 
-We'll declare an array of hashrec of size HASH_TAB and an array of
-character strings.
+Given an array of strings detect and print the first
+duplicate string.
 
-We'll use init_hash_table to make sure our initial buckets are empty.
+We'll solve this problem using a hash table. We'll insert
+each string that isn't a member of the hashtable.
 
-To detect a duplicate we'll iterate through each string and if the string
-isn't in our hash table we'll simply insert it. 
+If we encouter a string that is already a member in the hash table,
+then that string is a duplicate.
 
-If a string is already in our hash table then that string is a duplicate and
-we print the duplicate string.
+Let's code it.
 
-    [Action: Change the string array and run the program again]
+We'll begin be declaring a hashrec array that we'll use a 
+our hash table.
 
-Let's try out our algorithm by changing the array of string a bit.
+I've made it size HASH_TAB which defined as size 512.
 
-Don't let this example limit your imagination on how hash tables can be used.
+Be sure to adjust this size based on your application.
 
-We could implement hash tables that map integers, strings, points or any
-other convenient thing to strings, integers other data structures and so on.
+We'll also declare a local variable i that we'll use to 
+iterate through the string array.
+
+The first step in the our algorithm is to initialize the hash
+table with all empty buckets. 
+
+Remember that an empty bucket is identified by a NULL key pointer.
+
+Next we'll iterate through each string in the string array.
+
+If the current string isn't in the hash table then we'll insert it.
+
+However if a string is already in our hash table, then that string 
+is a duplicate and we print the duplicate string and exit the for loop.
+
+Let's see this algorithm in action.
+
+In our string list, grape is a duplicate string. If we execute
+this program it should print out the string "grape".
+
+Now I'll remove the duplicate string and we should see nothing printed
+out.
 
 In the next lecture we'll be going over a bit of theory on hash tables.
+
+Until next time!
