@@ -81,8 +81,10 @@ void init_hash_table(struct hashrec hashtab[]){
 }
 
 int main(){
-  struct hashrec hashtab[HASH_TAB];
+
   char *set[] = {"grape", "cherry", "orange", "grape", "apple"}; 
+
+  struct hashrec hashtab[HASH_TAB];
   size_t i;
 
   init_hash_table(hashtab); 
