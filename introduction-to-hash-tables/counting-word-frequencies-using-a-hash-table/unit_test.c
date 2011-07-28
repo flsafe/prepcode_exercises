@@ -13,36 +13,33 @@
 *
 ***/
 
-struct wordrec {
-  char *word; 
+struct hashrec{
+  char *key;
   int count;
-} wordtab[HASH_TAB];
+}; 
 
-unsigned int h1(char *word){
-  unsigned int hash;
-  char *c;
-  
-  c = word;
-  for(hash = 0 ; *c ; c++)
-    hash = hash * 37 + *c;
-  return hash;
+unsigned int h1(char *k){
+  unsigned h;
+  unsigned char *c;
+ 
+  h = 0;
+  for(c = (unsigned char*) k; *c ; c++)
+    h = h * 37 + *c;
+  return h;
 }
 
-unsigned int h2(char *word){
-  unsigned int hash;
-  char *c;
+unsigned int h2(char *k){
+  unsigned int h;
+  unsigned char *c;
   
-  c = word;
-  for(hash = 0 ; *c ; c++)
-    hash = hash * 31 + *c;
-  if (hash % 2 == 0)
-    return hash + 1;
-  else
-    return hash;
+  h = 0;
+  for(c = (unsigned char*) k ; *c ; c++)
+    h = h * 31 + *c;
+  return h % 2 == 0 ? h + 1 : h;
 }
 
-unsigned hash(char *word, int i){
-  return (h1(word) + i * h2(word)) % HASH_TAB;
+unsigned hash(char *k, int i){
+  return (h1(k) + i * h2(k)) % HASH_TAB;
 }
 
 int get_word(char *word, int limit){
@@ -68,59 +65,72 @@ int get_word(char *word, int limit){
   return word[0];
 }
 
-char *strdup(char *w){
+char *cpy(char *w){
   char *d, *dest;
 
   d = dest = malloc(strlen(w)+1);
-  while ((*d++ = *w++)) ;
+  if (d)
+    while ((*d++ = *w++)) ;
   return dest;
 }
 
-int insert_word(char *word){
+unsigned int locate(struct hashrec hashtab[], char *k){
   int i;
-  int h;
-  
-  for (i = 0 ; i < HASH_TAB ; i++){
-    h = hash(word, i);
-    if (NULL == wordtab[h].word){
-      wordtab[h].word = strdup(word);
-      wordtab[h].count++;
-      return 1;
-    } else if (strcmp(wordtab[h].word, word) == 0){
-      wordtab[h].count++; 
-      return 1;
-    }
-  }
-  return 0;
-}
-
-int is_word(char *word){
-  int i, h;
+  unsigned int b;
 
   for (i = 0 ; i < HASH_TAB ; i++){
-    h = hash(word, i);
-    if (strcmp(word, wordtab[h].word) == 0)
-      return 1;
+    b = hash(k, i);
+    if (NULL == hashtab[b].key ||
+        strcmp(hashtab[b].key, k) == 0)
+      break;
   }
-  return 0;
+  return b;
 }
 
-void count_word_freqs(void){
-  int i;
-  char word[MAX_WORD];
+int insert_word(struct hashrec hashtab[], char *k){
+  unsigned int b = locate(hashtab, k);
 
-  while (get_word(word, MAX_WORD) != EOF){
-    insert_word(word);
+  if (NULL == hashtab[b].key){
+    hashtab[b].key = cpy(k);
+    hashtab[b].count++;
+    return 1;
   }
+  else if (strcmp(hashtab[b].key, k) == 0){
+    hashtab[b].count++;
+    return 1;
+  }
+  else
+    return 0;
+}
 
-  for (i = 0 ; i < HASH_TAB ; i++)
-    if (NULL != wordtab[i].word){
-      printf("%s %d\n", wordtab[i].word, wordtab[i].count);
-      printf("is word? %d\n", is_word(wordtab[i].word));
-    }
+int is_word(struct hashrec hashtab[], char *k){
+  unsigned int b = locate(hashtab, k);
+
+  if (NULL == hashtab[b].key)
+    return 0;
+  else 
+    return strcmp(hashtab[b].key, k) == 0;
 }
 
 int main(){
-  count_word_freqs();
+  int b;
+  char word[MAX_WORD];
+  struct hashrec wordtab[HASH_TAB];
+
+  for (b = 0 ; b < HASH_TAB ; b++){
+    wordtab[b].key = NULL;
+    wordtab[b].count = 0;
+  }
+
+  while (get_word(word, MAX_WORD) != EOF){
+    insert_word(wordtab, word);
+  }
+
+  for (b = 0 ; b < HASH_TAB ; b++)
+    if (wordtab[b].key){
+      printf("%s %d\n", wordtab[b].key, wordtab[b].count);
+      printf("is word? %d\n", is_word(wordtab, wordtab[b].key));
+    }
+
   return 0;
 }
