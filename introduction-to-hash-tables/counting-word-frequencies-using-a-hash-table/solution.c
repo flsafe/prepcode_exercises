@@ -82,6 +82,28 @@ void count_words(char *words[], int n){
 }
 /*end_prototype*/
 
+
+#include <unistd.h>
+#include <stdlib.h>
+#include <signal.h>
+#include <sys/wait.h>
+#include <sys/types.h>
+
+#define N_UNIT_TESTS 5
+
+/* File descriptors for stdin and stdout */
+#define IN 0
+#define OUT 1
+
+/* Pipe used to communicate with each forked process */
+int pipe_des[2];
+
+/* The maxium length of the YAML output string */
+#define MAX_YAML_LEN 1024
+
+/* The indentation in spaces in the yaml string */
+#define INDENT 4
+
 void print(){
   int b;
 
@@ -131,27 +153,6 @@ void test_repeat_word(){
   print();
   clear();
 }
-
-#include <unistd.h>
-#include <stdlib.h>
-#include <signal.h>
-#include <sys/wait.h>
-#include <sys/types.h>
-
-#define N_UNIT_TESTS 5
-
-/* File descriptors for stdin and stdout */
-#define IN 0
-#define OUT 1
-
-/* Pipe used to communicate with each forked process */
-int pipe_des[2];
-
-/* The maxium length of the YAML output string */
-#define MAX_YAML_LEN 1024
-
-/* The indentation in spaces in the yaml string */
-#define INDENT 4
 
 /* Used to ditch when something goes wrong */
 void quitif(int err){
