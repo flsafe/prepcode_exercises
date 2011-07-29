@@ -80,14 +80,42 @@ void count_words(char *words[], int n){
     insert_word(words[i]);
 }
 
-int main(){
+void print(){
   int b;
 
-  char *words[] = {"at", "at", "at", "sat", "cat", "cat", "mat", "on", "the"};
-  count_words(words, (int) sizeof(words)/sizeof(char*));
+  printf("***\n");
   for (b = 0 ; b < HASH_TAB ; b++)
     if (hashtab[b].key)
       printf("%s %d\n", hashtab[b].key, hashtab[b].count);
+}
+
+void clear(){
+  int b;
+
+  for (b = 0 ; b < HASH_TAB ; b++){
+    hashtab[b].key = NULL;
+    hashtab[b].count = 0;
+  }
+}
+
+int main(){
+  char *input1[] = {"at", "at", "at", "sat", "cat", "cat", "mat", "on", "the"};
+  char *input2[] = {"programming"};
+  char *input3[] = {"a", "b", "c"};
+  char *input4[] = {"a", "a", "a", "a", "a"};
+
+  count_words(input1, sizeof(input1)/sizeof(char*));
+  print();
+  clear();
+  count_words(input2, sizeof(input2)/sizeof(char*));
+  print();
+  clear();
+  count_words(input3, sizeof(input3)/sizeof(char*));
+  print();
+  clear();
+  count_words(input4, sizeof(input4)/sizeof(char*));
+  print();
+  clear();
 
   return 0;
 }
