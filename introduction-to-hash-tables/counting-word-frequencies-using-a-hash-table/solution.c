@@ -6,17 +6,10 @@
 #define MAX_WORD 32
 #define HASH_TAB 512
 
-/***
-* Do h1 and h2 need to be modulo HASH_TAB or is it enought that
-* hash is modulo HASH_TAB?
-*
-*
-***/
-
 struct hashrec{
   char *key;
   int count;
-}; 
+} hashtab[HASH_TAB]; 
 
 unsigned int h1(char *k){
   unsigned h;
@@ -42,29 +35,6 @@ unsigned hash(char *k, int i){
   return (h1(k) + i * h2(k)) % HASH_TAB;
 }
 
-int get_word(char *word, int limit){
-  int c;
-  char *w = word;
-
-  while (isspace(c = fgetc(stdin))) /* Skip white space */
-    ;
-
-  if (EOF != c){
-    *w++ = c;
-  } else {
-    *w = '\0';
-    return c; 
-  }
-
-  for (; --limit > 0 ; w++)
-    if (!isalpha(*w = fgetc(stdin))){
-      ungetc(*w, stdin);
-      break;
-    }
-  *w = '\0';
-  return word[0];
-}
-
 char *cpy(char *w){
   char *d, *dest;
 
@@ -74,7 +44,7 @@ char *cpy(char *w){
   return dest;
 }
 
-unsigned int locate(struct hashrec hashtab[], char *k){
+unsigned int locate(char *k){
   int i;
   unsigned int b;
 
@@ -87,8 +57,8 @@ unsigned int locate(struct hashrec hashtab[], char *k){
   return b;
 }
 
-int insert_word(struct hashrec hashtab[], char *k){
-  unsigned int b = locate(hashtab, k);
+int insert_word(char *k){
+  unsigned int b = locate(k);
 
   if (NULL == hashtab[b].key){
     hashtab[b].key = cpy(k);
@@ -103,34 +73,21 @@ int insert_word(struct hashrec hashtab[], char *k){
     return 0;
 }
 
-int is_word(struct hashrec hashtab[], char *k){
-  unsigned int b = locate(hashtab, k);
-
-  if (NULL == hashtab[b].key)
-    return 0;
-  else 
-    return strcmp(hashtab[b].key, k) == 0;
+void count_words(char *words[], int n){
+  int i;
+  
+  for (i = 0 ; i < n ; i++)
+    insert_word(words[i]);
 }
 
 int main(){
   int b;
-  char word[MAX_WORD];
-  struct hashrec wordtab[HASH_TAB];
 
-  for (b = 0 ; b < HASH_TAB ; b++){
-    wordtab[b].key = NULL;
-    wordtab[b].count = 0;
-  }
-
-  while (get_word(word, MAX_WORD) != EOF){
-    insert_word(wordtab, word);
-  }
-
+  char *words[] = {"at", "at", "at", "sat", "cat", "cat", "mat", "on", "the"};
+  count_words(words, (int) sizeof(words)/sizeof(char*));
   for (b = 0 ; b < HASH_TAB ; b++)
-    if (wordtab[b].key){
-      printf("%s %d\n", wordtab[b].key, wordtab[b].count);
-      printf("is word? %d\n", is_word(wordtab, wordtab[b].key));
-    }
+    if (hashtab[b].key)
+      printf("%s %d\n", hashtab[b].key, hashtab[b].count);
 
   return 0;
 }
