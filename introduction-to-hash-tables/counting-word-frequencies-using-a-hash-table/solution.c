@@ -1,3 +1,4 @@
+/*start_prototype*/
 #include <stdio.h>
 #include <ctype.h>
 #include <string.h>
@@ -79,6 +80,7 @@ void count_words(char *words[], int n){
   for (i = 0 ; i < n ; i++)
     insert_word(words[i]);
 }
+/*end_prototype*/
 
 void print(){
   int b;
@@ -98,24 +100,183 @@ void clear(){
   }
 }
 
+void test_multiple_words(){
+  char *input[] = {"at", "at", "at", "cat", "mat", "cat", "on", "the"};
+
+  count_words(input, sizeof(input)/sizeof(char*));
+  print();
+  clear();
+}
+
+void test_one_word(){
+  char *input[] = {"programming"};
+
+  count_words(input, sizeof(input)/sizeof(char*));
+  print();
+  clear();
+}
+
+void test_unique_words(){
+  char *input[] = {"a", "b", "c"};
+
+  count_words(input, sizeof(input)/sizeof(char*));
+  print();
+  clear();
+}
+
+void test_repeat_word(){
+  char *input[] = {"a", "a", "a", "a", "a"};
+
+  count_words(input, sizeof(input)/sizeof(char*));
+  print();
+  clear();
+}
+
+#include <unistd.h>
+#include <stdlib.h>
+#include <signal.h>
+#include <sys/wait.h>
+#include <sys/types.h>
+
+#define N_UNIT_TESTS 5
+
+/* File descriptors for stdin and stdout */
+#define IN 0
+#define OUT 1
+
+/* Pipe used to communicate with each forked process */
+int pipe_des[2];
+
+/* The maxium length of the YAML output string */
+#define MAX_YAML_LEN 1024
+
+/* The indentation in spaces in the yaml string */
+#define INDENT 4
+
+/* Used to ditch when something goes wrong */
+void quitif(int err){
+  if (-1 == err){
+    perror("error");
+    exit(1);
+  }
+}
+
+void print_results(){
+  int bytes_read, err;
+  char buff[MAX_YAML_LEN] = "";
+
+  bytes_read = read(pipe_des[IN], buff, MAX_YAML_LEN);
+  quitif(bytes_read);
+  err = close(pipe_des[IN]);
+  quitif(err);
+	
+  err = write(OUT, buff, bytes_read); 
+  quitif(err);
+}
+
+void err_handler(int sig){
+  int i;
+  char arith_err[128] = "";
+  char mem_err[128] = "";
+  char sys_err[128] = "";
+  char indent[128] = "";
+
+  for (i = 0 ; i < INDENT ; i++)
+    indent[i] = ' ';  
+  sprintf(arith_err, "%s%s", indent, "error: arithmetic\n");
+  sprintf(mem_err, "%s%s", indent, "error: memory\n");
+  sprintf(sys_err, "%s%s", indent, "error: memory\n");
+
+  switch (sig){
+    case SIGFPE:
+      write(pipe_des[OUT], arith_err, strlen(arith_err));
+    break;
+
+    case SIGBUS:
+      write(pipe_des[OUT], mem_err, strlen(mem_err));
+    break;
+
+    case SIGSEGV:
+      write(pipe_des[OUT], mem_err, strlen(mem_err));
+    break;
+
+    case SIGSYS:
+      write(pipe_des[OUT], sys_err, strlen(sys_err));
+    break;
+
+    case SIGILL:
+      write(pipe_des[OUT], mem_err, strlen(mem_err));
+    break;
+  }
+  raise(sig);
+}
+
+void handle_signals(){
+  struct sigaction act;
+
+  sigemptyset(&act.sa_mask);
+  sigemptyset(&act.sa_mask);
+  act.sa_flags = SA_RESETHAND;
+  act.sa_handler = err_handler;
+
+  sigaction(SIGFPE, &act, NULL);
+  sigaction(SIGBUS, &act, NULL);
+  sigaction(SIGSEGV, &act, NULL);
+  sigaction(SIGSYS, &act, NULL);
+  sigaction(SIGILL, &act, NULL);
+  sigaction(SIGSYS, &act, NULL);
+}
+
+void run_tests(){
+  int err;
+  pid_t stat;
+
+  /* Each of the test functions will be called in its own fork */
+  void (** unit_test) (void);
+  void (* test_fns[N_UNIT_TESTS + 1]) (void) = 
+    {test_multiple_words,
+     test_one_word,
+     test_unique_words,
+     test_repeat_word, NULL};
+
+  for (unit_test = test_fns ; *unit_test ; unit_test++){
+
+    err = pipe(pipe_des);
+    quitif(err);
+
+    switch (fork()){
+
+      case -1:
+        quitif(-1);
+        break;
+
+      /* Execute the unit test in the child */
+      case 0:
+        close(pipe_des[IN]);
+
+        handle_signals();
+        
+        (*unit_test)();
+        err = close(pipe_des[OUT]);
+        quitif(err);
+
+        exit(0);
+        break;
+
+      /* Wait for the child to finish the unit test */
+      default:
+        close(pipe_des[OUT]);
+
+        err = wait(&stat);
+        quitif(err);
+
+        print_results();
+        break;
+    }
+  }
+}
+
 int main(){
-  char *input1[] = {"at", "at", "at", "sat", "cat", "cat", "mat", "on", "the"};
-  char *input2[] = {"programming"};
-  char *input3[] = {"a", "b", "c"};
-  char *input4[] = {"a", "a", "a", "a", "a"};
-
-  count_words(input1, sizeof(input1)/sizeof(char*));
-  print();
-  clear();
-  count_words(input2, sizeof(input2)/sizeof(char*));
-  print();
-  clear();
-  count_words(input3, sizeof(input3)/sizeof(char*));
-  print();
-  clear();
-  count_words(input4, sizeof(input4)/sizeof(char*));
-  print();
-  clear();
-
+  run_tests();
   return 0;
 }
