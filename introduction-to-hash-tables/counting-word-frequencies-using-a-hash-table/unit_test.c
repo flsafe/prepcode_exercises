@@ -11,11 +11,11 @@ struct hashrec{        /* Represents a record in the hash table */
   int count;
 };
 
-struct hashrec hashtab[HASH_TAB]; /* A hash table has been declared for you */
+struct hashrec hashtab[HASH_TAB]; /* A hash table has been declared for you! */
 
 void count_words(char *words[], int n){
 
-  /* Your code goes here. Note that
+  /* Your code goes here. Note that a
      hashtable has been declared for you! */
 
 }
