@@ -1,14 +1,35 @@
 /*start_prototype*/
+#define MAX_WORD 32
+#define HASH_TAB 512
 
-  /* The exercise template goes here */
+/* We've declared a hash table named
+   hashtab for you */
+struct hashrec{
+  char *key;
+  int count;
+} hashtab[HASH_TAB]; 
 
+void count_words(char *words[], int n){
+
+  /* Your code goes here. Notice
+     that we've declared a hash table 
+     above for you to use! */
+
+}
 /*end_prototype*/
 
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
 /* The maxium length of the YAML output string */
-#define MAX_YAML_LEN 1024
+#define MAX_YAML_LEN 10000 
 
 /* The indentation in spaces in the yaml string */
 #define INDENT 4
+
+/* Max output of the function under test */
+#define MAX_OUT_BUFF 10000 
 
 struct yaml_string{
   char yaml[MAX_YAML_LEN];
@@ -22,80 +43,118 @@ void print_test_info(struct yaml_string * ys,
                      char * points);
 void print_test_output(struct yaml_string * ys, char * str);
 
+int cmp(const void *p1, const void *p2){
+  struct hashrec *r1 = (struct hashrec *) p1;
+  struct hashrec *r2 = (struct hashrec *) p2;
+
+  if (r2->key == NULL || r2->key == NULL)
+    return r1->key - r2->key;
+  else
+    return strcmp(r1->key, r2->key);
+}
+
+void print_hashtab(char *out, unsigned int max){
+  int b;
+  char line[MAX_WORD];
+
+  for (b = 0 ; b < HASH_TAB ; b++)
+    if (hashtab[b].key){
+      snprintf(line, MAX_WORD, "%s %d\n", hashtab[b].key, hashtab[b].count);
+      if (strlen(line) + strlen(out) < max)
+        strcat(out, line);
+      else
+        break;
+    }
+}
+
+void clear_hashtab(){
+  int b;
+
+  for (b = 0 ; b < HASH_TAB ; b++){
+    hashtab[b].key = NULL;
+    hashtab[b].count = 0;
+  }
+}
 
 void test_multiple_words(void){
-  char str[128] = "abcd";
+  char buff[MAX_OUT_BUFF] = "";
+  char *words[] = {"the", "cat", "the", "hat", "the", "mat"};
   struct yaml_string * ys = create_yaml();
 
-  print_test_info(ys, "test_multiple_words", "a abcd", "bcd", "20");
+  print_test_info(ys, "test_multiple_words", 
+                      "the cat the hat the mat", 
+                      "cat 1\nhat 1\nmat 1\nthe 3", 
+                      "20");
 
-  /* Call the function you are testing */
-  /* remove_char('a', str); */
+  clear_hashtab();
+  count_words(words, sizeof(words)/sizeof(char*));
 
-  /* Put the output in a buffer and print it */
-  str[sizeof(str) - 1] = '\0'; 
-
-  print_test_output(ys, str); 
+  qsort(hashtab, HASH_TAB, sizeof(struct hashrec), cmp);
+  print_hashtab(buff, MAX_OUT_BUFF);
+  print_test_output(ys, buff); 
 }
 
 void test_one_word(void){
-  char str[128] = "abcd";
+  char buff[MAX_OUT_BUFF] = "";
+  char *words[] = {"programming"};
   struct yaml_string * ys = create_yaml();
 
-  print_test_info(ys, "test_one_word", "a abcd", "bcd", "20");
+  print_test_info(ys, "test_one_word", "programming", "programming 1", "20");
+  
+  clear_hashtab();
+  count_words(words,sizeof(words)/sizeof(char*));
 
-  /* Call the function you are testing */
-  /* remove_char('a', str); */
-
-  /* Put the output in a buffer and print it */
-  str[sizeof(str) - 1] = '\0'; 
-
-  print_test_output(ys, str); 
+  qsort(hashtab, HASH_TAB, sizeof(struct hashrec), cmp);
+  print_hashtab(buff, MAX_OUT_BUFF);
+  print_test_output(ys, buff); 
 }
 
 void test_unique_words(void){
-  char str[128] = "abcd";
+  char buff[MAX_OUT_BUFF] = "";
+  char *words[] = {"cat", "sat", "on", "the", "mat"};
   struct yaml_string * ys = create_yaml();
 
-  print_test_info(ys, "test_unique_words", "a abcd", "bcd", "20");
+  print_test_info(ys, "test_unique_words", 
+                      "cat sat on the mat", 
+                      "cat 1\nmat 1\non 1\nsat 1\nthe 1", 
+                      "20");
 
-  /* Call the function you are testing */
-  /* remove_char('a', str); */
+  clear_hashtab();
+  count_words(words, sizeof(words)/sizeof(char*));
 
-  /* Put the output in a buffer and print it */
-  str[sizeof(str) - 1] = '\0'; 
-
-  print_test_output(ys, str); 
+  qsort(hashtab, HASH_TAB, sizeof(struct hashrec), cmp);
+  print_hashtab(buff, MAX_OUT_BUFF);
+  print_test_output(ys, buff); 
 }
 
 void test_repeat_word(void){
-  char str[128] = "abcd";
+  char buff[MAX_OUT_BUFF] = "";
+  char *words[] = {"a", "a", "a", "a", "a"};
   struct yaml_string * ys = create_yaml();
 
-  print_test_info(ys, "test_repeat_word", "a abcd", "bcd", "20");
+  print_test_info(ys, "test_repeat_word", "a a a a a", "a 5", "20");
 
-  /* Call the function you are testing */
-  /* remove_char('a', str); */
+  clear_hashtab();
+  count_words(words, sizeof(words)/sizeof(char*));
 
-  /* Put the output in a buffer and print it */
-  str[sizeof(str) - 1] = '\0'; 
-
-  print_test_output(ys, str); 
+  qsort(hashtab, HASH_TAB, sizeof(struct hashrec), cmp);
+  print_hashtab(buff, MAX_OUT_BUFF);
+  print_test_output(ys, buff); 
 }
 
 void test_zero_words(void){
-  char str[128] = "abcd";
+  char buff[MAX_OUT_BUFF] = "";
+  char *words[] = {NULL};
   struct yaml_string * ys = create_yaml();
 
-  print_test_info(ys, "test_zero_words", "a abcd", "bcd", "20");
+  print_test_info(ys, "test_zero_words", "", "", "20");
 
-  /* Call the function you are testing */
-  /* remove_char('a', str); */
+  clear_hashtab();
+  count_words(words, 0);
 
-  /* Put the output in a buffer and print it */
-  str[sizeof(str) - 1] = '\0'; 
-
-  print_test_output(ys, str); 
+  qsort(hashtab, HASH_TAB, sizeof(struct hashrec), cmp);
+  print_hashtab(buff, MAX_OUT_BUFF);
+  print_test_output(ys, buff); 
 }
 
 /**********
@@ -138,7 +197,7 @@ struct yaml_string * create_yaml(){
 }
 
 void append_line(struct yaml_string * s, char * str, int indent){
-  int i;
+  int i,j;
   int len = strlen(str);
 
   if (s->write + len > MAX_YAML_LEN)
@@ -148,8 +207,12 @@ void append_line(struct yaml_string * s, char * str, int indent){
   for (i = 0 ; i < indent ; i++)
     s->yaml[s->write++] = ' ';
 
-  for (i = 0 ; i < len ; i++)
+  for (i = 0 ; i < len ; i++){
     s->yaml[s->write++] = str[i];
+    if ('\n' == str[i])
+      for (j = 0 ; j < indent ; j++)
+        s->yaml[s->write++] = ' ';
+  }
 
   s->yaml[s->write++] = '\n';
 }
