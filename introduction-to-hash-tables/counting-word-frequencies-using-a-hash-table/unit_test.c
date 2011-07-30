@@ -1,5 +1,4 @@
 /*start_prototype*/
-#define MAX_WORD 32
 #define HASH_TAB 512
 
 /*
@@ -34,6 +33,8 @@ void count_words(char *words[], int n){
 
 /* Max output of the function under test */
 #define MAX_OUT_BUFF 10000 
+
+#define MAX_WORD 32
 
 struct yaml_string{
   char yaml[MAX_YAML_LEN];
