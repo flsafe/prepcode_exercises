@@ -16,6 +16,7 @@ void count_words(char *words[], int n){
 
 }
 /*end_prototype*/
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
