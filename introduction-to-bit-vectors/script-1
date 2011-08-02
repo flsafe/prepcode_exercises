@@ -1,0 +1,90 @@
+In this lecture we're going to cover a useful and compact
+data structure called a bit vector. The operations on a bit
+vector are somewhat similar to those on a hash table so it
+might be useful to go through that lecture first.
+
+Let say we want to represent a set of numbers between say
+between 0 and N inclusive.  Since we are treating the
+numbers as a set we can assume that there are no duplicates.
+We might also ask whether a particular number i is in the
+set. 
+
+Let think about an efficient way of storing these numbers.
+Notice that the numbers 0..N and how to quickly answer the
+query 'is i a number in the set'?
+
+If you've gone the hash table lecture then this may seem
+familiar to you but what would we use as keys and what 
+would our hash function be?
+
+Well, remember that our integers are in the range 0..N
+and each integer in that range could be a valid index into
+an array. We don't really need a hash functions because the
+integers themselves describe where they go in a hash table.
+
+If i is an integer in the range 0..N then we can store i in
+an array at index j.
+
+What exactly do we store at index i to denote that index j
+is a member of the set? An obvious thing to store is a true
+boolean value. Then if i is a member of the set then index j
+is set with true. This operation of going to index i to
+determine if i is a member of the set is done in constant
+time.
+
+This means that testing for integer i takes the same amount
+of step whether we are representing 10 integers or 20
+integers or even a million integers.
+
+There is an inefficiency though. In C booleans are
+represented as integers. This means that we'll probably need
+at least 8 bits to represent one boolean value. We can do
+better!
+
+We don't really need that entire byte to represent true or
+false. We can do it with only 1 bit. 1 for true 0 for
+false. With this scheme if we want to set i as a member of
+the set then we set the jth bit to 1. If we want to exclude
+j as a member of our set then we set the jth bit to 0. Now
+we can represent 8 values with just one byte! Much better.
+
+How exactly do we map an integer,j, to the jth bit in our
+array? It's not too bad, just a bit of arithmetic. 
+
+First we have to decide the type of our array; a good choice
+is the native word size of the machine we are on. We'll
+assume a 32 bit word size and an integer size of 32 bits and
+an array of integers.
+
+We'll say that each array index is a bucket, Given a number
+j we need to decide which 'bucket' it will go into. For
+example array[0] is one bucket and array[1] is another. Each
+bucket is a 32 bit integer, therefore each bit can represent
+1 integer for a total of 32 integers per bucket.
+
+Figuring the appropriate bucket is just a matter of dividing
+by our word size 32 and because 32 is a power of two we can
+divide efficiently using the right shift operator. 
+
+Now that we know the bucket we need to know which bit in the
+bucket to set. We need to set the bit equal to the remainder
+of i divided by 32. For example if we want to set the
+integer 33, it goes in bucket 33/32 which is 1, and we set
+the bit 33 mod 32 which is bit 1.
+
+An efficient way of finding 33 mod 32 is simply taking the
+first 5 bits of 33 with a bit mask. Take a look at a list of integers in
+binary form. The last five bits of the integer follow the
+pattern 0..31 which is the same pattern as the integer mod 32.
+
+Thus setting a bit based on integer i can be done with the
+statement: bitv[i>>5] |= 1 << (i & 0x1f)
+
+And testing a bit associated with integer i can be done
+with: bitv[i>>5] & 1 << (i & 0x1f)
+
+Although they wouldn't win a beauty contest, these
+statements are an efficient way of setting bits.
+
+In the next tutorial we'll go over actually implementing
+the bit vector. Until next time.
