@@ -24,7 +24,7 @@ and how to efficiently answer
 the query 'is i an integer in
 the set'?
 
-If you've gone the hash table
+If you've gone throught the hash table
 lecture then this may seem
 familiar. Using a hash table
 we'll need a hashing strategy
